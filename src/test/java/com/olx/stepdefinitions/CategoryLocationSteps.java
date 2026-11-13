@@ -16,6 +16,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
+import org.openqa.selenium.JavascriptExecutor;
+
 import java.util.List;
 
 public class CategoryLocationSteps {
@@ -48,32 +50,36 @@ public class CategoryLocationSteps {
 	    }
 	    
 	    @When("I click on the category {string}")
-	    public void i_click_on_the_category(String category) {
-	        // 1. Wait for the page to load completely
+	    public void i_click_on_the_category(String category) throws Exception {
 	        try {
-	            Thread.sleep(3000); 
-	        } catch (InterruptedException e) {
-	            e.printStackTrace();
-	        }
+	            Thread.sleep(4000); // Give the page plenty of time to load popups
 
-	        // 2. Use a robust XPath that looks for an <a> tag containing the exact text
-	        // This ignores the changing 'aria-label' and 'data-aut-id' attributes
-	        String xpath = "//a[.//span[normalize-space()='" + category + "']]";
-	        
-	        try {
-	            WebElement categoryLink = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(xpath)));
-	            actions.moveToElement(categoryLink).click().perform();
+	            // 1. Try to close the initial Location popup if it exists
+	            try {
+	                WebElement closeLocationPopup = driver.findElement(By.xpath("//button[@class='_1Ny5V']"));
+	                closeLocationPopup.click();
+	                Thread.sleep(1000);
+	            } catch (Exception e) {
+	                // Popup didn't appear, continue
+	            }
+
+	            // 2. Find the category link
+	            // Using a very broad XPath to find the specific text "Motorcycles"
+	            String xpath = "//*[normalize-space(text())='" + category + "']";
+	            WebElement categoryLink = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(xpath)));
+
+	            // 3. Use JavaScript to click (bypasses 'element not clickable' errors)
+	            ((org.openqa.selenium.JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", categoryLink);
+	            Thread.sleep(500);
+	            ((org.openqa.selenium.JavascriptExecutor) driver).executeScript("arguments[0].click();", categoryLink);
+	            
 	            System.out.println("Clicked on category: " + category);
+
 	        } catch (Exception e) {
-	            System.out.println("Primary XPath failed. Trying alternative...");
-	            // Fallback XPath: Just look for any span with the text
-	            String fallbackXpath = "//span[contains(text(),'" + category + "')]";
-	            WebElement fallbackLink = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(fallbackXpath)));
-	            actions.moveToElement(fallbackLink).click().perform();
-	            System.out.println("Clicked on category using fallback: " + category);
+	            System.out.println("Failed to click category: " + e.getMessage());
+	            throw e;
 	        }
 	    }
-	    
 	    @And("I click on the subcategory {string} in the left pane")
 	    public void i_click_on_the_subcategory_in_the_left_pane(String subcategory) throws InterruptedException {
 	        Thread.sleep(3000); // Wait for the page to load after clicking category
