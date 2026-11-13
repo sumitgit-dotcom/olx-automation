@@ -135,21 +135,28 @@ public class CategoryLocationSteps {
 	    
 	    @Then("I print the search results")
 	    public void i_print_the_search_results() throws InterruptedException {
-	        // Wait for the results page to load
-	        Thread.sleep(3000);
+	        System.out.println("Waiting for results page to load...");
+	        Thread.sleep(5000); 
 	        
-	        List<WebElement> results = driver.findElements(By.xpath("//li[@data-aut-id='itemBox']"));
+	        // Scroll down to trigger lazy loading
+	        JavascriptExecutor js = (JavascriptExecutor) driver;
+	        js.executeScript("window.scrollBy(0, 500);");
+	        Thread.sleep(2000);
+
+	        // Find ALL elements that act as a result card (OLX changes this class, so we look for the data attribute)
+	        List<WebElement> results = driver.findElements(By.xpath("//li[contains(@class, '_3gXl_') or @data-aut-id='itemBox']"));
 	        
 	        System.out.println("========== RESULTS FOUND ==========");
 	        if (results.isEmpty()) {
-	            System.out.println("No results found for this category and location.");
+	            System.out.println("No results found. Printing Page Source to debug:");
+	            // If it still fails, we print the page title to see where we ended up
+	            System.out.println("Current URL: " + driver.getCurrentUrl());
+	            System.out.println("Page Title: " + driver.getTitle());
 	        } else {
 	            System.out.println("Total results found: " + results.size());
-	            
-	            
 	            for (int i = 0; i < Math.min(5, results.size()); i++) {
-	                // Assuming the title is inside an h4 tag. Update this locator if the site uses something else.
-	                String title = results.get(i).findElement(By.xpath(".//h4")).getText();
+	                // Get the text of the result card and print the first line (the title)
+	                String title = results.get(i).getText().split("\n")[0];
 	                System.out.println("Result " + (i + 1) + ": " + title);
 	            }
 	        }
