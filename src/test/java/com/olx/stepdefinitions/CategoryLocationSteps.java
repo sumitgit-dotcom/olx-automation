@@ -33,22 +33,31 @@ public class CategoryLocationSteps {
 	        WebDriverManager.chromedriver().setup();
 	        ChromeOptions options = new ChromeOptions();
 	        
-	        // Only these arguments are needed for a visible browser
+	        // 1. Headless mode
 	        options.addArguments("--headless=new");
+	        
+	        // 2. CRITICAL: Bypass bot detection
+	        options.addArguments("--disable-blink-features=AutomationControlled");
+	        options.addArguments("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
+	        
+	        // 3. Standard stability options
 	        options.addArguments("--no-sandbox");
 	        options.addArguments("--disable-dev-shm-usage");
-	        options.addArguments("--remote-allow-origins=*");
 	        options.addArguments("--window-size=1920,1080");
 
 	        driver = new ChromeDriver(options);
+	        
+	        // 4. Remove the "webdriver" flag from the browser
+	        ((JavascriptExecutor) driver).executeScript("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})");
+	        
 	        wait = new WebDriverWait(driver, Duration.ofSeconds(15));
 	        actions = new Actions(driver);
 	    }
 	    
 	    @Given("I am on the homepage")
 	    public void i_am_on_the_homepage() {
-	        // Replace with your actual URL
 	        driver.get("https://www.olx.in/"); 
+	        System.out.println("Navigated to OLX. Current URL: " + driver.getCurrentUrl());
 	    }
 	    
 	    @When("I click on the category {string}")
