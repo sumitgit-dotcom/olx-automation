@@ -49,53 +49,50 @@ public class CategoryLocationSteps {
 	    
 	    @When("I click on the category {string}")
 	    public void i_click_on_the_category(String category) {
-	        // Using the XPath you provided, replacing 'Motorcycles' with the variable
-	        String xpath = "//a[@aria-label='suggested-categories-" + category + "']//span[@data-aut-id='header_link'][normalize-space()='" + category + "']";
+	        // 1. Wait for the page to load completely
+	        try {
+	            Thread.sleep(3000); 
+	        } catch (InterruptedException e) {
+	            e.printStackTrace();
+	        }
+
+	        // 2. Use a robust XPath that looks for an <a> tag containing the exact text
+	        // This ignores the changing 'aria-label' and 'data-aut-id' attributes
+	        String xpath = "//a[.//span[normalize-space()='" + category + "']]";
 	        
-	        WebElement categoryLink = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(xpath)));
-	        
-	        actions.moveToElement(categoryLink).click().perform();
-	        System.out.println("Clicked on category: " + category);
+	        try {
+	            WebElement categoryLink = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(xpath)));
+	            actions.moveToElement(categoryLink).click().perform();
+	            System.out.println("Clicked on category: " + category);
+	        } catch (Exception e) {
+	            System.out.println("Primary XPath failed. Trying alternative...");
+	            // Fallback XPath: Just look for any span with the text
+	            String fallbackXpath = "//span[contains(text(),'" + category + "')]";
+	            WebElement fallbackLink = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(fallbackXpath)));
+	            actions.moveToElement(fallbackLink).click().perform();
+	            System.out.println("Clicked on category using fallback: " + category);
+	        }
 	    }
 	    
 	    @And("I click on the subcategory {string} in the left pane")
 	    public void i_click_on_the_subcategory_in_the_left_pane(String subcategory) throws InterruptedException {
-	        
-	        // 1. Wait for the page to load after clicking "Motorcycles"
-	        Thread.sleep(2000); 
-	        
-	        // 2. Try a much more robust XPath (searches for an <a> tag that contains the text)
+	        Thread.sleep(3000); // Wait for the page to load after clicking category
 	        String xpath = "//a[contains(., '" + subcategory + "')]";
-	        
-	        try {
-	            WebElement subcategoryLink = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(xpath)));
-	            actions.moveToElement(subcategoryLink).click().perform();
-	            System.out.println("Clicked on subcategory: " + subcategory);
-	        } catch (Exception e) {
-	            System.out.println("Could not find subcategory. Trying alternative XPath...");
-	            // Fallback XPath just in case the first one fails
-	            String fallbackXpath = "//span[contains(text(),'" + subcategory + "')]";
-	            WebElement fallbackLink = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(fallbackXpath)));
-	            actions.moveToElement(fallbackLink).click().perform();
-	            System.out.println("Clicked on subcategory using fallback: " + subcategory);
-	        }
+	        WebElement subcategoryLink = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(xpath)));
+	        actions.moveToElement(subcategoryLink).click().perform();
+	        System.out.println("Clicked on subcategory: " + subcategory);
 	    }
 	    
 	    @And("I scroll and click on the location {string}")
 	    public void i_scroll_and_click_on_the_location(String location) throws InterruptedException {
-	        Thread.sleep(2000);
-	        
-	        // Changed to look for any div or span containing the text
+	        Thread.sleep(3000);
 	        String xpath = "//*[contains(text(),'" + location + "')]";
-	        
 	        WebElement locationOption = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(xpath)));
-	        
 	        actions.moveToElement(locationOption).perform();
 	        Thread.sleep(1000); 
 	        actions.click(locationOption).perform();
 	        System.out.println("Clicked on location: " + location);
 	    }
-	    
 	    
 	    @Then("I print the search results")
 	    public void i_print_the_search_results() throws InterruptedException {
