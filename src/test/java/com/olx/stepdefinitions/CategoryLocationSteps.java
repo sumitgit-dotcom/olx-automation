@@ -15,6 +15,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.IOException;
 import java.time.Duration;
 import org.openqa.selenium.JavascriptExecutor;
 import org.apache.commons.io.FileUtils;
@@ -99,14 +100,32 @@ public class CategoryLocationSteps {
 	        }
 	    }
 	    @And("I click on the subcategory {string} in the left pane")
-	    public void i_click_on_the_subcategory_in_the_left_pane(String subcategory) throws InterruptedException {
-	        Thread.sleep(3000); // Wait for the page to load after clicking category
-	        String xpath = "//a[contains(., '" + subcategory + "')]";
-	        WebElement subcategoryLink = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(xpath)));
-	        actions.moveToElement(subcategoryLink).click().perform();
-	        System.out.println("Clicked on subcategory: " + subcategory);
+	    public void i_click_on_the_subcategory_in_the_left_pane(String subcategory) throws InterruptedException, Exception {
+	        // 1. Wait a full 5 seconds for the Motorcycles page to load completely
+	        Thread.sleep(5000); 
+	        
+	        // 2. Find the element by text
+	        String xpath = "//*[contains(text(), '" + subcategory + "')]";
+	        
+	        try {
+	            WebElement subcategoryLink = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(xpath)));
+	            
+	            // 3. Scroll to it and click using JavaScript (bypasses overlay/clickable issues)
+	            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", subcategoryLink);
+	            Thread.sleep(1000);
+	            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", subcategoryLink);
+	            
+	            System.out.println("Clicked on subcategory: " + subcategory);
+	            
+	        } catch (Exception e) {
+	            // Screenshot debug if it fails again
+	            System.out.println("FAILED TO CLICK SUBCATEGORY. Taking screenshot...");
+	            org.openqa.selenium.TakesScreenshot ts = (org.openqa.selenium.TakesScreenshot) driver;
+	            java.io.File source = ts.getScreenshotAs(org.openqa.selenium.OutputType.FILE);
+	            FileUtils.copyFile(source, new java.io.File("target/subcategory_failure.png"));
+	            throw e;
+	        }
 	    }
-	    
 	    @And("I scroll and click on the location {string}")
 	    public void i_scroll_and_click_on_the_location(String location) throws InterruptedException {
 	        Thread.sleep(3000);
