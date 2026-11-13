@@ -6,9 +6,8 @@
       <class name="com.olx.runners.TestRunner">
         <methods>
           <include name="setUpClass"/>
-          <include name="runScenario"/>
+          <include name="runScenario" invocation-numbers="0"/>
           <include name="tearDownClass"/>
-          <include name="setBrowser"/>
         </methods>
       </class> <!-- com.olx.runners.TestRunner -->
     </classes>

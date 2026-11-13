@@ -12,8 +12,7 @@ import org.testng.annotations.Optional;
         glue = "com.olx.stepdefinitions", 
         plugin = {
                 "pretty",
-                "html:target/cucumber-reports/cucumber.html",
-                "json:target/cucumber-reports/cucumber.json"
+                
         },
         monochrome = true
 )
@@ -21,17 +20,7 @@ import org.testng.annotations.Optional;
 public class TestRunner extends AbstractTestNGCucumberTests {
 	
 	
-	 @BeforeClass(alwaysRun = true)
-	    @Parameters({"browser"})
-	    public void setBrowser(@Optional("chrome") String browser) { // Add @Optional
-	        System.setProperty("browser", browser);
-	        System.out.println(">>> Running on browser = " + browser);
-	    }
-
-    @Override
-    @DataProvider(parallel = true)
-    public Object[][] scenarios() {
-        return super.scenarios();
+	 
     }
 
-}
+
