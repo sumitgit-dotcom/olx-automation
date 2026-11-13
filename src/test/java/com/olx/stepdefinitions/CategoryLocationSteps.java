@@ -30,6 +30,7 @@ public class CategoryLocationSteps {
 	        ChromeOptions options = new ChromeOptions();
 	        
 	        // Only these arguments are needed for a visible browser
+	        options.addArguments("--headless=new");
 	        options.addArguments("--no-sandbox");
 	        options.addArguments("--disable-dev-shm-usage");
 	        options.addArguments("--remote-allow-origins=*");
