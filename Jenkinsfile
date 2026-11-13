@@ -4,7 +4,8 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/sumitgit-dotcom/JAVA-.git'
+                // Updated URL here
+                git branch: 'main', url: 'https://github.com/sumitgit-dotcom/olx-automation.git'
             }
         }
 
