@@ -34,21 +34,17 @@ public class CategoryLocationSteps {
 	        WebDriverManager.chromedriver().setup();
 	        ChromeOptions options = new ChromeOptions();
 	        
-	        // 1. Headless mode
-	        options.addArguments("--headless=new");
+	        // REMOVE or COMMENT OUT this line:
+	        // options.addArguments("--headless=new");
 	        
-	        // 2. CRITICAL: Bypass bot detection
+	        // Keep these:
 	        options.addArguments("--disable-blink-features=AutomationControlled");
 	        options.addArguments("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
-	        
-	        // 3. Standard stability options
 	        options.addArguments("--no-sandbox");
 	        options.addArguments("--disable-dev-shm-usage");
 	        options.addArguments("--window-size=1920,1080");
 
 	        driver = new ChromeDriver(options);
-	        
-	        // 4. Remove the "webdriver" flag from the browser
 	        ((JavascriptExecutor) driver).executeScript("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})");
 	        
 	        wait = new WebDriverWait(driver, Duration.ofSeconds(15));
@@ -164,8 +160,14 @@ public class CategoryLocationSteps {
 	    @After
 	    public void tearDown() {
 	        if (driver != null) {
+	            // Wait 10 seconds before closing so you can see the final page
+	            try {
+	                System.out.println("Test finished. Keeping browser open for 10 seconds so you can see it...");
+	                Thread.sleep(10000); 
+	            } catch (InterruptedException e) {
+	                e.printStackTrace();
+	            }
 	            driver.quit();
 	        }
-	    }
 
-}
+}}
