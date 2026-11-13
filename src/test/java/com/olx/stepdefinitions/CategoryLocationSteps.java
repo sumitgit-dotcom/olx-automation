@@ -17,6 +17,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 import org.openqa.selenium.JavascriptExecutor;
+import org.apache.commons.io.FileUtils;
+
 
 import java.util.List;
 
@@ -52,32 +54,39 @@ public class CategoryLocationSteps {
 	    @When("I click on the category {string}")
 	    public void i_click_on_the_category(String category) throws Exception {
 	        try {
-	            Thread.sleep(4000); // Give the page plenty of time to load popups
+	            Thread.sleep(5000); // Wait 5 seconds for page to fully load
 
-	            // 1. Try to close the initial Location popup if it exists
+	            // 1. Try to click the "Location" popup if it blocks the screen
 	            try {
-	                WebElement closeLocationPopup = driver.findElement(By.xpath("//button[@class='_1Ny5V']"));
-	                closeLocationPopup.click();
-	                Thread.sleep(1000);
+	                WebElement locationPopup = driver.findElement(By.xpath("//button[contains(text(),'Confirm')] | //button[contains(text(),'Close')]"));
+	                locationPopup.click();
+	                System.out.println("Closed a popup.");
+	                Thread.sleep(2000);
 	            } catch (Exception e) {
-	                // Popup didn't appear, continue
+	                // No popup, continue
 	            }
 
-	            // 2. Find the category link
-	            // Using a very broad XPath to find the specific text "Motorcycles"
-	            String xpath = "//*[normalize-space(text())='" + category + "']";
+	            // 2. Find the category
+	            String xpath = "//span[contains(text(),'" + category + "')] | //a[contains(text(),'" + category + "')]";
 	            WebElement categoryLink = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(xpath)));
-
-	            // 3. Use JavaScript to click (bypasses 'element not clickable' errors)
-	            ((org.openqa.selenium.JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", categoryLink);
-	            Thread.sleep(500);
-	            ((org.openqa.selenium.JavascriptExecutor) driver).executeScript("arguments[0].click();", categoryLink);
 	            
+	            // 3. Click via JavaScript
+	            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", categoryLink);
 	            System.out.println("Clicked on category: " + category);
 
 	        } catch (Exception e) {
-	            System.out.println("Failed to click category: " + e.getMessage());
-	            throw e;
+	            // If it fails, take a screenshot so we can see what Jenkins sees
+	            System.out.println("FAILED TO CLICK CATEGORY. Taking screenshot...");
+	            try {
+	                org.openqa.selenium.TakesScreenshot ts = (org.openqa.selenium.TakesScreenshot) driver;
+	                java.io.File source = ts.getScreenshotAs(org.openqa.selenium.OutputType.FILE);
+	                // Now that we imported FileUtils, we can just use it directly
+	                FileUtils.copyFile(source, new java.io.File("target/failure_screenshot.png"));
+	                System.out.println("Screenshot saved to target/failure_screenshot.png");
+	            } catch (Exception ex) {
+	                System.out.println("Could not save screenshot.");
+	            }
+	            throw e; // Fail the test
 	        }
 	    }
 	    @And("I click on the subcategory {string} in the left pane")
