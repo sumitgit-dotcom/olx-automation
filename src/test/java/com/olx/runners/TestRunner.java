@@ -8,14 +8,10 @@ import org.testng.annotations.Parameters;
 import org.testng.annotations.Optional;
 
 @CucumberOptions(
-        features = "src/test/resources/features",
-        glue = "com.olx.stepdefinitions", 
-        plugin = {
-                "pretty",
-                
-        },
-        monochrome = true
-)
+	    features = "src/test/resources/features",
+	    glue = "com.olx.stepdefinitions", // Make sure this matches your steps folder
+	    plugin = {"pretty"}
+	)
 
 public class TestRunner extends AbstractTestNGCucumberTests {
 	

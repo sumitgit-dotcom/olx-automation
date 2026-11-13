@@ -2,7 +2,8 @@
 <suite name="Suite">
     <test name="Test">
         <classes>
-            <class name="runners.TestRunner"/>
+            <!-- Updated the class name to include the com.olx package -->
+            <class name="com.olx.runners.TestRunner"/>
         </classes>
     </test>
 </suite>
