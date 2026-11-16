@@ -3,6 +3,7 @@ import com.olx.utils.WebDriverFactory;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import java.util.List;
@@ -30,14 +31,18 @@ public class HomePage {
     }
 
     public List<String> getClickableLinks() {
-        return driver.findElements(By.tagName("a")).stream()
-                .filter(link -> link.isDisplayed() && link.isEnabled())
-                .map(link -> {
-                    String text = link.getText().trim();
-                    String href = link.getAttribute("href");
-                    return text.isEmpty() ? href : text + " (" + href + ")";
-                })
-                .toList();
+        return (List<String>) ((JavascriptExecutor) driver).executeScript(
+                "return Array.from(document.querySelectorAll('a'))"
+                        + ".filter(link => {"
+                        + "const style = window.getComputedStyle(link);"
+                        + "return link.href && link.getClientRects().length > 0"
+                        + " && style.display !== 'none' && style.visibility !== 'hidden';"
+                        + "})"
+                        + ".map(link => {"
+                        + "const text = (link.innerText || link.getAttribute('aria-label') || '').trim();"
+                        + "return text ? text + ' (' + link.href + ')' : link.href;"
+                        + "});"
+        );
     }
 
     public void clickHeaderAccountIcon() {
