@@ -54,6 +54,27 @@ public class HomePageSteps {
             Assert.assertFalse(links.isEmpty(), "No clickable links were found on the OLX home page");
         }
 
+        @Then("I open the login dialog from the header")
+        public void open_login_dialog_from_header() {
+            homePage.clickHeaderAccountIcon();
+        }
+
+        @Then("I choose to continue with phone")
+        public void choose_continue_with_phone() {
+            homePage.clickContinueWithPhone();
+        }
+
+        @Then("I enter phone number {string}")
+        public void enter_phone_number(String phoneNumber) {
+            homePage.enterPhoneNumber(phoneNumber);
+        }
+
+        @Then("I click Next")
+        public void click_next() {
+            homePage.clickNext();
+            System.out.println("Clicked Next after entering the phone number.");
+        }
+
 	    @After
 	    public void tearDown() {
 	        // This runs after EACH scenario, safely closing the specific browser thread
