@@ -6,6 +6,7 @@ import io.cucumber.java.After;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import org.testng.Assert;
+import java.util.List;
 
 public class HomePageSteps {
 	
@@ -42,6 +43,16 @@ public class HomePageSteps {
 	        Assert.assertTrue(title.contains(expected),
 	                "Expected title to contain '" + expected + "' but was: " + title);
 	    }
+
+        @Then("I should see the clickable home page links printed in the console")
+        public void print_clickable_home_page_links() {
+            List<String> links = homePage.getClickableLinks();
+            System.out.println("=========================================");
+            System.out.println("Clickable links on OLX home page: " + links.size());
+            links.forEach(link -> System.out.println(" - " + link));
+            System.out.println("=========================================");
+            Assert.assertFalse(links.isEmpty(), "No clickable links were found on the OLX home page");
+        }
 
 	    @After
 	    public void tearDown() {
