@@ -1,4 +1,5 @@
 package com.olx.pages;
+
 import com.olx.utils.WebDriverFactory;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.By;
@@ -24,6 +25,7 @@ public class HomePage {
     public void open() {
         driver.get(URL);
     }
+    
     public String getTitle() {
         return driver.getTitle();
     }
@@ -132,6 +134,7 @@ public class HomePage {
                         + "and contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'low')]"));
         waitForPropertyResults();
     }
+    
     @SuppressWarnings("unchecked")
     public long clickLowestPricedProperty() {
         List<Map<String, Object>> listings = (List<Map<String, Object>>) ((JavascriptExecutor) driver).executeScript(
@@ -156,15 +159,51 @@ public class HomePage {
         String itemPath = href.substring(href.indexOf("/item/"));
         long price = ((Number) lowestListing.get("price")).longValue();
         By propertyLink = By.xpath("//a[contains(@href, '" + itemPath + "')]");
+        
+        // --- NEW CODE: Handle Google Vignette Ad Overlay ---
+        closeGoogleVignetteAd();
+        // ---------------------------------------------------
+
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
         WebElement property = wait.until(ExpectedConditions.elementToBeClickable(propertyLink));
+        
         ((JavascriptExecutor) driver).executeScript(
                 "arguments[0].scrollIntoView({block: 'center', inline: 'nearest'});", property);
-        wait.until(ExpectedConditions.elementToBeClickable(propertyLink)).click();
+                
+        // Click using Javascript as a fallback if normal click is intercepted
+        try {
+            wait.until(ExpectedConditions.elementToBeClickable(propertyLink)).click();
+        } catch (org.openqa.selenium.ElementClickInterceptedException e) {
+            System.out.println("Normal click intercepted, trying JS click...");
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", property);
+        }
+        
         new WebDriverWait(driver, Duration.ofSeconds(15))
                 .until(ExpectedConditions.urlContains("/item/"));
         return price;
     }
+
+    // --- NEW METHOD TO CLOSE ADS ---
+    private void closeGoogleVignetteAd() {
+        try {
+            // Wait max 3 seconds to see if the ad overlay appears
+            WebDriverWait adWait = new WebDriverWait(driver, Duration.ofSeconds(3));
+            
+            // Common locators for Google Vignette close buttons
+            By adCloseButton = By.xpath("//div[contains(@id, 'google_vignette')]//div[@aria-label='Close'] | //div[contains(@id, 'google_vignette')]//button | //*[contains(@id, 'dismiss-button')]");
+            
+            WebElement closeBtn = adWait.until(ExpectedConditions.elementToBeClickable(adCloseButton));
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", closeBtn);
+            System.out.println("Google Vignette ad detected and closed.");
+            
+            // Give it a second to disappear
+            Thread.sleep(1000); 
+        } catch (org.openqa.selenium.TimeoutException | InterruptedException e) {
+            // Ad didn't appear or wasn't clickable, continue normally
+            System.out.println("No Google Vignette ad appeared.");
+        }
+    }
+    // -------------------------------
 
     private void clickAfterScroll(By... locators) {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
@@ -182,6 +221,7 @@ public class HomePage {
         }
         throw new org.openqa.selenium.NoSuchElementException("Could not click a sort control for any supplied locator");
     }
+    
     private By locationLink(String location) {
         String slug = location.toLowerCase().replace(' ', '-');
         return By.xpath("//a[contains(translate(@href, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', "
@@ -197,6 +237,7 @@ public class HomePage {
                 "arguments[0].scrollIntoView({block: 'center', inline: 'nearest'});", link);
         wait.until(ExpectedConditions.elementToBeClickable(locator)).click();
     }
+    
     private boolean hasVisibleLink(By locator) {
         try {
             return driver.findElements(locator).stream().anyMatch(WebElement::isDisplayed);
@@ -209,6 +250,7 @@ public class HomePage {
         new WebDriverWait(driver, Duration.ofSeconds(30))
                 .until(ExpectedConditions.urlContains(segment));
     }
+    
     private void clickFirstAvailable(By... locators) {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
         for (By locator : locators) {
@@ -222,5 +264,4 @@ public class HomePage {
         }
         throw new org.openqa.selenium.NoSuchElementException("Could not find a clickable element for any supplied locator");
     }
-
-}
+} 	
