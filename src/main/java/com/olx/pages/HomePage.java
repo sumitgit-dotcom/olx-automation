@@ -18,7 +18,6 @@ public class HomePage {
     private static final String URL = "https://www.olx.in/";
     
     public HomePage() {
-        // Grabs the specific driver for the current parallel thread
         this.driver = WebDriverFactory.getDriver();
     }
     
@@ -160,50 +159,28 @@ public class HomePage {
         long price = ((Number) lowestListing.get("price")).longValue();
         By propertyLink = By.xpath("//a[contains(@href, '" + itemPath + "')]");
         
-        // --- NEW CODE: Handle Google Vignette Ad Overlay ---
-        closeGoogleVignetteAd();
-        // ---------------------------------------------------
-
+        // Wait for the element to exist
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-        WebElement property = wait.until(ExpectedConditions.elementToBeClickable(propertyLink));
+        WebElement property = wait.until(ExpectedConditions.presenceOfElementLocated(propertyLink));
         
+        // Scroll into view
         ((JavascriptExecutor) driver).executeScript(
                 "arguments[0].scrollIntoView({block: 'center', inline: 'nearest'});", property);
-                
-        // Click using Javascript as a fallback if normal click is intercepted
-        try {
-            wait.until(ExpectedConditions.elementToBeClickable(propertyLink)).click();
-        } catch (org.openqa.selenium.ElementClickInterceptedException e) {
-            System.out.println("Normal click intercepted, trying JS click...");
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", property);
-        }
         
+        // Wait a brief moment for any ads to fully render
+        try { Thread.sleep(2000); } catch (InterruptedException e) {}
+        
+        // --- CRITICAL FIX: Force click using Javascript to bypass ad overlays ---
+        System.out.println("Attempting to click property using JavascriptExecutor...");
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", property);
+        System.out.println("Javascript click executed.");
+        // ---------------------------------------------------------------------
+
+        // Wait for URL
         new WebDriverWait(driver, Duration.ofSeconds(15))
                 .until(ExpectedConditions.urlContains("/item/"));
         return price;
     }
-
-    // --- NEW METHOD TO CLOSE ADS ---
-    private void closeGoogleVignetteAd() {
-        try {
-            // Wait max 3 seconds to see if the ad overlay appears
-            WebDriverWait adWait = new WebDriverWait(driver, Duration.ofSeconds(3));
-            
-            // Common locators for Google Vignette close buttons
-            By adCloseButton = By.xpath("//div[contains(@id, 'google_vignette')]//div[@aria-label='Close'] | //div[contains(@id, 'google_vignette')]//button | //*[contains(@id, 'dismiss-button')]");
-            
-            WebElement closeBtn = adWait.until(ExpectedConditions.elementToBeClickable(adCloseButton));
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", closeBtn);
-            System.out.println("Google Vignette ad detected and closed.");
-            
-            // Give it a second to disappear
-            Thread.sleep(1000); 
-        } catch (org.openqa.selenium.TimeoutException | InterruptedException e) {
-            // Ad didn't appear or wasn't clickable, continue normally
-            System.out.println("No Google Vignette ad appeared.");
-        }
-    }
-    // -------------------------------
 
     private void clickAfterScroll(By... locators) {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
@@ -264,4 +241,4 @@ public class HomePage {
         }
         throw new org.openqa.selenium.NoSuchElementException("Could not find a clickable element for any supplied locator");
     }
-} 	
+}
