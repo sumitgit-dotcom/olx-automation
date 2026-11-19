@@ -6,7 +6,9 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.support.ui.Select;
 import java.util.List;
+import java.util.Map;
 import java.time.Duration;
 
 public class HomePage {
@@ -69,6 +71,144 @@ public class HomePage {
                 By.cssSelector("input[type='submit'][value='Next'], input[type='button'][value='Next']"));
     }
 
+    public void clickForSaleHousesAndApartments() {
+        clickFirstAvailable(By.xpath("//a[normalize-space(.)='For Sale: Houses & Apartments']"));
+        waitForUrlSegment("c1725");
+        waitForPropertyResults();
+    }
+
+    public void selectLocationInLeftPane(String location) {
+        By locationLink = locationLink(location);
+        if ("Indore".equalsIgnoreCase(location) && !hasVisibleLink(locationLink)) {
+            clickLocationLink(locationLink("Madhya Pradesh"));
+            waitForUrlSegment("madhya-pradesh_g2001162");
+        }
+
+        clickLocationLink(locationLink);
+        if ("Indore".equalsIgnoreCase(location)) {
+            waitForUrlSegment("indore_g4058916");
+        } else if ("Nipania".equalsIgnoreCase(location)) {
+            waitForUrlSegment("nipania_g1000000000002265");
+        }
+        waitForPropertyResults();
+    }
+
+    public void waitForPropertyResults() {
+        new WebDriverWait(driver, Duration.ofSeconds(30)).until(currentDriver ->
+                Boolean.TRUE.equals(((JavascriptExecutor) currentDriver).executeScript(
+                        "return document.readyState === 'complete' && "
+                                + "Array.from(document.querySelectorAll(\"a[href*='/item/']\"))"
+                                + ".some(link => link.getClientRects().length > 0);"
+                )));
+    }
+
+    public void sortPropertiesByPriceLowToHigh() {
+        for (WebElement dropdown : driver.findElements(By.tagName("select"))) {
+            Select select = new Select(dropdown);
+            WebElement priceOption = select.getOptions().stream()
+                    .filter(option -> {
+                        String text = option.getText().toLowerCase();
+                        return text.contains("price") && text.contains("low") && text.contains("high");
+                    })
+                    .findFirst()
+                    .orElse(null);
+            if (priceOption != null) {
+                select.selectByVisibleText(priceOption.getText());
+                waitForPropertyResults();
+                return;
+            }
+        }
+
+        clickAfterScroll(
+                By.cssSelector("[data-aut-id='sortByCategory']"),
+                By.xpath("//*[translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='sort by : date published' "
+                        + "or translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='sort by: date published' "
+                        + "or translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='date published']"));
+        clickAfterScroll(
+                By.xpath("//*[translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='price: low to high' "
+                        + "or translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='price low to high']"),
+                By.xpath("//*[self::button or self::li or @role='option'][contains("
+                        + "translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'price') "
+                        + "and contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'low')]"));
+        waitForPropertyResults();
+    }
+    @SuppressWarnings("unchecked")
+    public long clickLowestPricedProperty() {
+        List<Map<String, Object>> listings = (List<Map<String, Object>>) ((JavascriptExecutor) driver).executeScript(
+                "const listings = new Map();"
+                        + "for (const link of document.querySelectorAll(\"a[href*='/item/']\")) {"
+                        + "if (!link.getClientRects().length || getComputedStyle(link).visibility === 'hidden') continue;"
+                        + "const text = (link.innerText || '').trim();"
+                        + "const match = text.match(/(?:₹|Rs\\.?)\\s*([\\d,]+)/i);"
+                        + "if (!match) continue;"
+                        + "const price = Number(match[1].replace(/,/g, ''));"
+                        + "if (!listings.has(link.href)) listings.set(link.href, {href: link.href, text, price});"
+                        + "}"
+                        + "return Array.from(listings.values()).sort((a, b) => a.price - b.price);"
+        );
+
+        if (listings.isEmpty()) {
+            throw new org.openqa.selenium.NoSuchElementException("No visible property listings with a displayed price were found");
+        }
+
+        Map<String, Object> lowestListing = listings.get(0);
+        String href = (String) lowestListing.get("href");
+        String itemPath = href.substring(href.indexOf("/item/"));
+        long price = ((Number) lowestListing.get("price")).longValue();
+        By propertyLink = By.xpath("//a[contains(@href, '" + itemPath + "')]");
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+        WebElement property = wait.until(ExpectedConditions.elementToBeClickable(propertyLink));
+        ((JavascriptExecutor) driver).executeScript(
+                "arguments[0].scrollIntoView({block: 'center', inline: 'nearest'});", property);
+        wait.until(ExpectedConditions.elementToBeClickable(propertyLink)).click();
+        new WebDriverWait(driver, Duration.ofSeconds(15))
+                .until(ExpectedConditions.urlContains("/item/"));
+        return price;
+    }
+
+    private void clickAfterScroll(By... locators) {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+        for (By locator : locators) {
+            try {
+                WebElement element = wait.until(ExpectedConditions.elementToBeClickable(locator));
+                ((JavascriptExecutor) driver).executeScript(
+                        "arguments[0].scrollIntoView({block: 'center', inline: 'nearest'});", element);
+                wait.until(ExpectedConditions.elementToBeClickable(locator)).click();
+                return;
+            } catch (org.openqa.selenium.TimeoutException
+                    | org.openqa.selenium.ElementClickInterceptedException ignored) {
+                // Try the next visible sort-control locator.
+            }
+        }
+        throw new org.openqa.selenium.NoSuchElementException("Could not click a sort control for any supplied locator");
+    }
+    private By locationLink(String location) {
+        String slug = location.toLowerCase().replace(' ', '-');
+        return By.xpath("//a[contains(translate(@href, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', "
+                + "'abcdefghijklmnopqrstuvwxyz'), '" + slug + "_g') and "
+                + "(normalize-space(.)='" + location + "' or starts-with(normalize-space(.), '"
+                + location + " ('))]");
+    }
+
+    private void clickLocationLink(By locator) {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+        WebElement link = wait.until(ExpectedConditions.elementToBeClickable(locator));
+        ((JavascriptExecutor) driver).executeScript(
+                "arguments[0].scrollIntoView({block: 'center', inline: 'nearest'});", link);
+        wait.until(ExpectedConditions.elementToBeClickable(locator)).click();
+    }
+    private boolean hasVisibleLink(By locator) {
+        try {
+            return driver.findElements(locator).stream().anyMatch(WebElement::isDisplayed);
+        } catch (org.openqa.selenium.StaleElementReferenceException ignored) {
+            return false;
+        }
+    }
+
+    private void waitForUrlSegment(String segment) {
+        new WebDriverWait(driver, Duration.ofSeconds(30))
+                .until(ExpectedConditions.urlContains(segment));
+    }
     private void clickFirstAvailable(By... locators) {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
         for (By locator : locators) {

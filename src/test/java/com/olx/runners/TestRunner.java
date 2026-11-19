@@ -10,7 +10,7 @@ import org.testng.annotations.Optional;
 @CucumberOptions(
 	    features = "src/test/resources/features",
 	    glue = "com.olx.stepdefinitions", // Make sure this matches your steps folder
-	    tags = "@printable-links or @login",
+	    tags = "@printable-links or @login or @property-search",
 	    plugin = {"pretty"}
 	)
 

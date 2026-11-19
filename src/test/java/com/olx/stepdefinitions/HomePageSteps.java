@@ -5,6 +5,7 @@ import com.olx.utils.WebDriverFactory;
 import io.cucumber.java.After;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import org.testng.Assert;
 import java.util.List;
 
@@ -75,6 +76,33 @@ public class HomePageSteps {
             System.out.println("Clicked Next after entering the phone number.");
         }
 
+        @When("I open the For Sale: Houses & Apartments category from the header")
+        public void open_for_sale_houses_and_apartments_category() {
+            homePage.clickForSaleHousesAndApartments();
+        }
+
+        @When("I select {string} in the left location pane")
+        public void select_location_in_left_pane(String location) {
+            homePage.selectLocationInLeftPane(location);
+        }
+
+        @When("I wait for the property results to load")
+        public void wait_for_property_results() {
+            homePage.waitForPropertyResults();
+        }
+
+        @When("I sort properties by price from low to high")
+        public void sort_properties_by_price_low_to_high() {
+            homePage.sortPropertiesByPriceLowToHigh();
+        }
+
+        @Then("I open the lowest-priced property shown")
+        public void open_lowest_priced_property() {
+            long price = homePage.clickLowestPricedProperty();
+            System.out.println("Opened the lowest-priced property shown: ₹" + String.format("%,d", price));
+            Assert.assertTrue(homePage.getCurrentUrl().contains("/item/"),
+                    "The lowest-priced property listing did not open");
+        }
 	    @After
 	    public void tearDown() {
 	        // This runs after EACH scenario, safely closing the specific browser thread

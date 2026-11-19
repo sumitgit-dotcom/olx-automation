@@ -1,72 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testng-results ignored="0" total="2" passed="1" failed="1" skipped="0">
+<testng-results ignored="0" total="1" passed="1" failed="0" skipped="0">
   <reporter-output>
   </reporter-output>
-  <suite started-at="2026-11-13T11:25:34 IST" name="Default suite" finished-at="2026-11-13T11:26:52 IST" duration-ms="78185">
+  <suite started-at="2026-11-16T14:08:18 IST" name="Default suite" finished-at="2026-11-16T14:09:27 IST" duration-ms="69903">
     <groups>
       <group name="cucumber">
         <method signature="AbstractTestNGCucumberTests.runScenario(io.cucumber.testng.PickleWrapper,io.cucumber.testng.FeatureWrapper)[pri:0, instance:com.olx.runners.TestRunner@50caa560]" name="runScenario" class="io.cucumber.testng.AbstractTestNGCucumberTests"/>
       </group> <!-- cucumber -->
     </groups>
-    <test started-at="2026-11-13T11:25:34 IST" name="Default test" finished-at="2026-11-13T11:26:52 IST" duration-ms="78185">
+    <test started-at="2026-11-16T14:08:18 IST" name="Default test" finished-at="2026-11-16T14:09:27 IST" duration-ms="69903">
       <class name="com.olx.runners.TestRunner">
-        <test-method is-config="true" signature="setUpClass(org.testng.ITestContext)[pri:0, instance:com.olx.runners.TestRunner@50caa560]" started-at="2026-11-13T11:25:34 IST" name="setUpClass" finished-at="2026-11-13T11:25:35 IST" duration-ms="449" status="PASS">
+        <test-method is-config="true" signature="setUpClass(org.testng.ITestContext)[pri:0, instance:com.olx.runners.TestRunner@50caa560]" started-at="2026-11-16T14:08:18 IST" name="setUpClass" finished-at="2026-11-16T14:08:18 IST" duration-ms="718" status="PASS">
           <params>
             <param index="0">
               <value>
-                <![CDATA[org.testng.TestRunner@5624657a]]>
+                <![CDATA[org.testng.TestRunner@67536ae0]]>
               </value>
             </param>
           </params>
           <reporter-output>
           </reporter-output>
         </test-method> <!-- setUpClass -->
-        <test-method signature="runScenario(io.cucumber.testng.PickleWrapper,io.cucumber.testng.FeatureWrapper)[pri:0, instance:com.olx.runners.TestRunner@50caa560]" started-at="2026-11-13T11:25:35 IST" name="runScenario" description="Runs Cucumber Scenarios" data-provider="scenarios" finished-at="2026-11-13T11:26:32 IST" duration-ms="56920" status="FAIL">
+        <test-method signature="runScenario(io.cucumber.testng.PickleWrapper,io.cucumber.testng.FeatureWrapper)[pri:0, instance:com.olx.runners.TestRunner@50caa560]" started-at="2026-11-16T14:08:18 IST" name="runScenario" description="Runs Cucumber Scenarios" data-provider="scenarios" finished-at="2026-11-16T14:09:27 IST" duration-ms="69033" status="PASS">
           <params>
             <param index="0">
               <value>
-                <![CDATA["Search for Scooters in Madhya Pradesh"]]>
-              </value>
-            </param>
-            <param index="1">
-              <value>
-                <![CDATA["Category and Location Search"]]>
-              </value>
-            </param>
-          </params>
-          <exception class="org.openqa.selenium.TimeoutException">
-            <message>
-              <![CDATA[Expected condition failed: waiting for element found by By.xpath: //span[contains(text(),'Scooters')] to be clickable, but the element was not visible.
-(tried for 15 seconds with 500 milliseconds interval)
-Build info: version: '4.49.0', revision: 'bedb24f bedb24f6f703876e7e4c5d506f0d697eb358c720'
-System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '21.0.12.1'
-Driver info: org.openqa.selenium.chrome.ChromeDriver
-Capabilities {acceptInsecureCerts: false, browserName: chrome, browserVersion: 157.0.8103.51, chrome: {chromedriverVersion: 157.0.8103.78 (4b3d0dabb825..., userDataDir: C:\Users\admin\AppData\Loca...}, fedcm:accounts: true, goog:chromeOptions: {debuggerAddress: localhost:50790}, goog:processID: 14824, networkConnectionEnabled: false, pageLoadStrategy: normal, platformName: windows, proxy: Proxy(), se:cdp: ws://localhost:50790/devtoo..., se:cdpVersion: 157.0.8103.51, setWindowRect: true, strictFileInteractability: false, timeouts: {implicit: 0, pageLoad: 300000, script: 30000}, unhandledPromptBehavior: dismiss and notify, userAgent: Mozilla/5.0 (Windows NT 10...., webauthn:extension:cmtgKey: true, webauthn:extension:credBlob: true, webauthn:extension:largeBlob: true, webauthn:extension:minPinLength: true, webauthn:extension:prf: true, webauthn:virtualAuthenticators: true}
-Session ID: e2a69cb2555a26ea3202b0f8f63f2074]]>
-            </message>
-            <full-stacktrace>
-              <![CDATA[org.openqa.selenium.TimeoutException: Expected condition failed: waiting for element found by By.xpath: //span[contains(text(),'Scooters')] to be clickable, but the element was not visible.
-(tried for 15 seconds with 500 milliseconds interval)
-Build info: version: '4.49.0', revision: 'bedb24f bedb24f6f703876e7e4c5d506f0d697eb358c720'
-System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '21.0.12.1'
-Driver info: org.openqa.selenium.chrome.ChromeDriver
-Capabilities {acceptInsecureCerts: false, browserName: chrome, browserVersion: 157.0.8103.51, chrome: {chromedriverVersion: 157.0.8103.78 (4b3d0dabb825..., userDataDir: C:\Users\admin\AppData\Loca...}, fedcm:accounts: true, goog:chromeOptions: {debuggerAddress: localhost:50790}, goog:processID: 14824, networkConnectionEnabled: false, pageLoadStrategy: normal, platformName: windows, proxy: Proxy(), se:cdp: ws://localhost:50790/devtoo..., se:cdpVersion: 157.0.8103.51, setWindowRect: true, strictFileInteractability: false, timeouts: {implicit: 0, pageLoad: 300000, script: 30000}, unhandledPromptBehavior: dismiss and notify, userAgent: Mozilla/5.0 (Windows NT 10...., webauthn:extension:cmtgKey: true, webauthn:extension:credBlob: true, webauthn:extension:largeBlob: true, webauthn:extension:minPinLength: true, webauthn:extension:prf: true, webauthn:virtualAuthenticators: true}
-Session ID: e2a69cb2555a26ea3202b0f8f63f2074
-at org.openqa.selenium.support.ui.WebDriverWait.timeoutException(WebDriverWait.java:85)
-at org.openqa.selenium.support.ui.FluentWait.until(FluentWait.java:234)
-at com.olx.stepdefinitions.CategoryLocationSteps.i_click_on_the_subcategory_in_the_left_pane(CategoryLocationSteps.java:77)
-at ✽.I click on the subcategory "Scooters" in the left pane(file:///C:/Users/admin/eclipse-workspace/olx-automation/src/test/resources/features/CategoryLocation.feature:7)
-]]>
-            </full-stacktrace>
-          </exception> <!-- org.openqa.selenium.TimeoutException -->
-          <reporter-output>
-          </reporter-output>
-        </test-method> <!-- runScenario -->
-        <test-method signature="runScenario(io.cucumber.testng.PickleWrapper,io.cucumber.testng.FeatureWrapper)[pri:0, instance:com.olx.runners.TestRunner@50caa560]" started-at="2026-11-13T11:26:32 IST" name="runScenario" description="Runs Cucumber Scenarios" data-provider="scenarios" finished-at="2026-11-13T11:26:52 IST" duration-ms="20669" status="PASS">
-          <params>
-            <param index="0">
-              <value>
-                <![CDATA["Open OLX home page and verify title"]]>
+                <![CDATA["Count and print clickable links on the home page"]]>
               </value>
             </param>
             <param index="1">
@@ -78,7 +37,7 @@ at ✽.I click on the subcategory "Scooters" in the left pane(file:///C:/Users/a
           <reporter-output>
           </reporter-output>
         </test-method> <!-- runScenario -->
-        <test-method is-config="true" signature="tearDownClass()[pri:0, instance:com.olx.runners.TestRunner@50caa560]" started-at="2026-11-13T11:26:52 IST" name="tearDownClass" finished-at="2026-11-13T11:26:52 IST" duration-ms="15" status="PASS">
+        <test-method is-config="true" signature="tearDownClass()[pri:0, instance:com.olx.runners.TestRunner@50caa560]" started-at="2026-11-16T14:09:27 IST" name="tearDownClass" finished-at="2026-11-16T14:09:27 IST" duration-ms="12" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- tearDownClass -->

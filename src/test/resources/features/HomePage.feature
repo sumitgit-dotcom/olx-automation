@@ -17,3 +17,14 @@ Feature: OLX Home Page
     And I choose to continue with phone
     And I enter phone number "8871220199"
     And I click Next
+
+  @property-search
+  Scenario: Open the lowest-priced property in Nipania, Indore
+    Given I launch the browser and navigate to OLX home page
+    When I open the For Sale: Houses & Apartments category from the header
+    And I select "Indore" in the left location pane
+    And I wait for the property results to load
+    And I select "Nipania" in the left location pane
+    And I wait for the property results to load
+    And I sort properties by price from low to high
+    Then I open the lowest-priced property shown
